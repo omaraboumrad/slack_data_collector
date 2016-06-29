@@ -10,9 +10,9 @@ setup(
     license='MIT',
     packages=['slackcollector'],
     install_requires=[
+        'six',
         'requests',
         'pyslack',
-        'PyYAML'
     ],
     zip_safe=False,
 )

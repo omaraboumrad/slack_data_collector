@@ -1,38 +1,11 @@
-# SlackDataCollector
-#
-# Unit tests for Collector
-#
-# @version: alpha-0.0.1
-# @author: Bassem Dghaidy
-
-import datetime
 import json
 import os
 import unittest
 
-from slackcollector.collector import Collector
+from slackcollector import collector
 
 
 class TestCollector(unittest.TestCase):
-
-    def setUp(self):
-        # Get the configuration file from /src/
-        self.config_file = 'config.example.yml'
-
-        # Load it
-        self.collector_inst = Collector()
-
-    def test_load_config_file_success(self):
-        self.collector_inst.load_config(self.config_file)
-        self.assertIsNotNone(self.collector_inst.data_dir)
-        self.assertIsNotNone(self.collector_inst.data_file_prefix)
-
-    def test_load_config_file_failure(self):
-        """
-        Test a non existent configuration file
-        """
-        self.assertRaises(IOError, self.collector_inst.load_config,
-                          '/boguspath')
 
     def test_anonymize_data_success(self):
         """
@@ -44,22 +17,14 @@ class TestCollector(unittest.TestCase):
 
         with open(test_json_file) as data_file:
             json_data = json.load(data_file)
-        clean_json_data = self.collector_inst.anonymize_data(json_data)
+
+        clean_json_data = collector.anonymize(json_data)
         sensitive_keys_set = set(['profile', 'real_name', 'name'])
+
         for item in clean_json_data['members']:
             # If the intersection of the "sensitive_keys_set" and keys sets is
             # empty the we have cleared these keys and their values
             self.assertFalse(sensitive_keys_set.intersection(set(item.keys())))
-
-    def test_get_today_date(self):
-        """
-        Build the formatted date for today and test its equality
-        with what's returned from get_today_date()
-        """
-        today = datetime.datetime.now()
-        formatted_date = '{}-{}-{}'.format(today.day, today.month, today.year)
-        self.assertEquals(formatted_date, self.collector_inst.get_today_date())
-
 
 if __name__ == '__main__':
     unittest.main()
